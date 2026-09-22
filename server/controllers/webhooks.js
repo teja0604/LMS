@@ -65,12 +65,9 @@ export const clerkWebhooks = async (req, res) => {
 }
 
 
-// Stripe Gateway Initialize
-const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
-
-
 // Stripe Webhooks to Manage Payments Action
 export const stripeWebhooks = async (request, response) => {
+  const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
   const sig = request.headers['stripe-signature'];
 
   let event;
@@ -79,7 +76,7 @@ export const stripeWebhooks = async (request, response) => {
     event = stripeInstance.webhooks.constructEvent(request.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   }
   catch (err) {
-    response.status(400).send(`Webhook Error: ${err.message}`);
+    return response.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   // Handle the event
