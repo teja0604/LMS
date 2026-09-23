@@ -4,40 +4,184 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-  font-family: Outfit;
+* {
+  font-family: 'Outfit', sans-serif;
+}
+
+:root {
+  --color-primary: #0E3A43;
+  --color-primary-hover: #155965;
+  --color-accent: #A84B2A;
+  --color-accent-light: #F3D8CC;
+  --color-bg: #F7F7F2;
+  --color-surface: #FFFFFF;
+  --color-text-main: #17252A;
+  --color-text-muted: #637278;
+  --color-border: #DCE5E3;
+  --color-success: #2F6B4F;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    background-color: #F7F7F2;
+    color: #17252A;
+  }
+  
+  body {
+    background-color: #F7F7F2;
+    color: #17252A;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
   display: none;
 }
 
-.rich-text { font-size: 15px; color: #7A7B7D; }
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-.rich-text p { margin-bottom: 16px; }
+.animate-fade-in-up {
+  animation: fadeInUp 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
-.rich-text h1 { font-size: 36px; font-weight: 800; color: #252525; margin: 32px 0; }
+.stagger-1 { animation-delay: 60ms; }
+.stagger-2 { animation-delay: 120ms; }
+.stagger-3 { animation-delay: 180ms; }
+.stagger-4 { animation-delay: 240ms; }
 
-.rich-text h2 { font-size: 22px; font-weight: 700; color: #252525; margin: 24px 0; }
+/* Interactive Hover States */
+.course-card-hover {
+  transition: transform 250ms ease-out, box-shadow 250ms ease-out, border-color 250ms ease-out;
+}
 
-.rich-text h3 { font-size: 18px; font-weight: 600; color: #333333; margin: 20px 0; }
+.course-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(14, 58, 67, 0.1);
+  border-color: rgba(14, 58, 67, 0.25);
+}
 
-.rich-text h4 { font-size: 16px; font-weight: 500; color: #444444; margin: 16px 0; }
+.btn-primary {
+  background-color: #0E3A43;
+  color: #FFFFFF;
+  transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
 
-.rich-text h5 { font-size: 14px; font-weight: 400; color: #555555; margin: 12px 0; }
+.btn-primary:hover {
+  background-color: #155965;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 58, 67, 0.2);
+}
 
-.rich-text h6 { font-size: 12px; font-weight: 400; color: #666666; margin: 8px 0; }
+.btn-secondary {
+  background-color: transparent;
+  border: 1.5px solid #0E3A43;
+  color: #0E3A43;
+  transition: all 180ms ease;
+}
 
-.rich-text strong { font-weight: 700; }
+.btn-secondary:hover {
+  background-color: #F3D8CC;
+  transform: translateY(-1px);
+  color: #0E3A43;
+}
 
-.rich-text ol { margin-left: 30px; list-style-type: decimal; }
+.image-scale-hover {
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-.rich-text ul { margin-left: 30px; list-style-type: disc; }
+.image-scale-hover:hover {
+  transform: scale(1.02);
+}
 
-.rich-text li { margin-bottom: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.rich-text {
+  font-size: 15px;
+  color: #637278;
+  line-height: 1.6;
+}
+
+.rich-text p {
+  margin-bottom: 16px;
+}
+
+.rich-text h1 {
+  font-size: 36px;
+  font-weight: 800;
+  color: #17252A;
+  margin: 32px 0;
+}
+
+.rich-text h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #17252A;
+  margin: 24px 0;
+}
+
+.rich-text h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #17252A;
+  margin: 20px 0;
+}
+
+.rich-text h4 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #17252A;
+  margin: 16px 0;
+}
+
+.rich-text h5 {
+  font-size: 14px;
+  font-weight: 500;
+  color: #637278;
+  margin: 12px 0;
+}
+
+.rich-text h6 {
+  font-size: 12px;
+  font-weight: 500;
+  color: #637278;
+  margin: 8px 0;
+}
+
+.rich-text strong {
+  font-weight: 700;
+  color: #17252A;
+}
+
+.rich-text ol {
+  margin-left: 30px;
+  list-style-type: decimal;
+}
+
+.rich-text ul {
+  margin-left: 30px;
+  list-style-type: disc;
+}
+
+.rich-text li {
+  margin-bottom: 8px;
+}

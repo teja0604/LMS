@@ -6,6 +6,26 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#0E3A43',
+          hover: '#155965',
+        },
+        accent: {
+          DEFAULT: '#A84B2A',
+          light: '#F3D8CC',
+        },
+        brand: {
+          bg: '#F7F7F2',
+          surface: '#FFFFFF',
+          text: '#17252A',
+          muted: '#637278',
+          border: '#DCE5E3',
+          success: '#2F6B4F',
+          footerText: '#D5E0E1',
+          footerLink: '#E6EFEE',
+        },
+      },
       gridTemplateColumns:{
         'auto': 'repeat(auto-fit, minmax(200px, 1fr))'
       },
@@ -23,7 +43,9 @@ export default {
         'course-card': '424px',
       },
       boxShadow: {
-        'custom-card': '0px 4px 15px 2px rgba(0, 0, 0, 0.1)',
+        'custom-card': '0px 4px 20px rgba(14, 58, 67, 0.08)',
+        'subtle': '0 2px 10px rgba(14, 58, 67, 0.05)',
+        'subtle-hover': '0 12px 28px rgba(14, 58, 67, 0.12)',
       },
     },
   },

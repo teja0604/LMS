@@ -3,40 +3,46 @@ import { assets } from '../../assets/assets';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 md:px-36 text-left w-full mt-10">
-      <div className="flex flex-col md:flex-row items-start px-8 md:px-0 justify-center gap-10 md:gap-32 py-10 border-b border-white/30">
+    <footer className="bg-[#0E3A43] md:px-36 px-6 text-left w-full mt-16 text-[#D5E0E1]">
+      <div className="flex flex-col md:flex-row items-start justify-between gap-10 md:gap-16 py-12 border-b border-white/15 max-w-7xl mx-auto">
 
-        <div className="flex flex-col md:items-start items-center w-full">
-          <img src={assets.logo_dark} alt="logo" />
-          <p className="mt-6 text-center md:text-left text-sm text-white/80">
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text.
+        <div className="flex flex-col md:items-start items-center w-full md:max-w-xs">
+          <img src={assets.logo_dark} alt="EduLearn Pro" className="w-36" />
+          <p className="mt-5 text-center md:text-left text-sm text-[#D5E0E1] leading-relaxed">
+            EduLearn Pro is a modern learning platform delivering world-class curriculum, practical projects, and verifiable credentials.
           </p>
         </div>
 
-        <div className="flex flex-col md:items-start items-center w-full">
-          <h2 className="font-semibold text-white mb-5">Company</h2>
-          <ul className="flex md:flex-col w-full justify-between text-sm text-white/80 md:space-y-2">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About us</a></li>
-            <li><a href="#">Contact us</a></li>
-            <li><a href="#">Privacy policy</a></li>
+        <div className="flex flex-col md:items-start items-center w-full md:w-auto">
+          <h2 className="font-semibold text-[#FFFFFF] text-base mb-4">Company</h2>
+          <ul className="flex md:flex-col gap-4 md:gap-2 text-sm text-[#E6EFEE]">
+            <li><a href="#" className="hover:text-[#F3D8CC] transition-colors">Home</a></li>
+            <li><a href="#" className="hover:text-[#F3D8CC] transition-colors">About us</a></li>
+            <li><a href="#" className="hover:text-[#F3D8CC] transition-colors">Contact us</a></li>
+            <li><a href="#" className="hover:text-[#F3D8CC] transition-colors">Privacy policy</a></li>
           </ul>
         </div>
 
-        <div className="hidden md:flex flex-col items-start w-full">
-          <h2 className="font-semibold text-white mb-5">Subscribe to our newsletter</h2>
-          <p className="text-sm text-white/80">
-            The latest news, articles, and resources, sent to your inbox weekly.
+        <div className="hidden md:flex flex-col items-start w-full md:max-w-sm">
+          <h2 className="font-semibold text-[#FFFFFF] text-base mb-4">Subscribe to our newsletter</h2>
+          <p className="text-sm text-[#D5E0E1] leading-relaxed">
+            The latest tutorials, course updates, and tech resources, sent directly to your inbox.
           </p>
-          <div className="flex items-center gap-2 pt-4">
-            <input className="border border-gray-500/30 bg-gray-800 text-gray-500 placeholder-gray-500 outline-none w-64 h-9 rounded px-2 text-sm" type="email" placeholder="Enter your email" />
-            <button className="bg-blue-600 w-24 h-9 text-white rounded">Subscribe</button>
+          <div className="flex items-center gap-2 pt-4 w-full">
+            <input 
+              className="border border-[#DCE5E3]/20 bg-[#155965]/80 text-[#FFFFFF] placeholder-[#D5E0E1]/60 outline-none w-full h-10 rounded-lg px-3 text-sm focus:border-[#F3D8CC] transition-colors" 
+              type="email" 
+              placeholder="Enter your email" 
+            />
+            <button className="bg-[#A84B2A] hover:bg-[#A84B2A]/90 h-10 px-5 text-white font-medium text-sm rounded-lg transition-colors whitespace-nowrap">
+              Subscribe
+            </button>
           </div>
         </div>
 
       </div>
-      <p className="py-4 text-center text-xs md:text-sm text-white/60">
-        Copyright 2024 © GreatStack. All Right Reserved.
+      <p className="py-6 text-center text-xs md:text-sm text-[#D5E0E1]/80">
+        Copyright 2024 © EduLearn Pro. All Right Reserved.
       </p>
     </footer>
   );

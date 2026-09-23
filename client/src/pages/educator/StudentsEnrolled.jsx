@@ -21,7 +21,7 @@ const StudentsEnrolled = () => {
       if (data.success) {
         setEnrolledStudents(data.enrolledStudents.reverse())
       } else {
-        toast.success(data.message)
+        toast.error(data.message)
       }
 
     } catch (error) {
@@ -36,35 +36,47 @@ const StudentsEnrolled = () => {
   }, [isEducator])
 
   return enrolledStudents ? (
-    <div className="min-h-screen flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0">
-      <div className="flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20 ">
-        <table className="table-fixed md:table-auto w-full overflow-hidden pb-4">
-          <thead className="text-gray-900 border-b border-gray-500/20 text-sm text-left">
+    <div className="w-full space-y-6 max-w-6xl">
+      <div className="pb-4 border-b border-[#DCE5E3]">
+        <span className="text-xs font-semibold uppercase tracking-wider text-[#A84B2A]">Student Records</span>
+        <h1 className="text-2xl font-bold text-[#17252A] mt-1">Enrolled Students</h1>
+        <p className="text-sm text-[#637278] mt-1">View learners actively enrolled across all your courses.</p>
+      </div>
+
+      <div className="bg-white border border-[#DCE5E3] rounded-xl overflow-hidden shadow-subtle">
+        <table className="table-fixed md:table-auto w-full">
+          <thead className="text-[#17252A] bg-[#F7F7F2] border-b border-[#DCE5E3] text-xs uppercase tracking-wider text-left">
             <tr>
-              <th className="px-4 py-3 font-semibold text-center hidden sm:table-cell">#</th>
-              <th className="px-4 py-3 font-semibold">Student Name</th>
-              <th className="px-4 py-3 font-semibold">Course Title</th>
-              <th className="px-4 py-3 font-semibold hidden sm:table-cell">Date</th>
+              <th className="px-5 py-3.5 font-semibold text-center hidden sm:table-cell w-16">#</th>
+              <th className="px-5 py-3.5 font-semibold">Student Name</th>
+              <th className="px-5 py-3.5 font-semibold">Course Title</th>
+              <th className="px-5 py-3.5 font-semibold hidden sm:table-cell">Enrollment Date</th>
             </tr>
           </thead>
-          <tbody className="text-sm text-gray-500">
+          <tbody className="text-sm text-[#637278] divide-y divide-[#DCE5E3]">
             {enrolledStudents.map((item, index) => (
-              <tr key={index} className="border-b border-gray-500/20">
-                <td className="px-4 py-3 text-center hidden sm:table-cell">{index + 1}</td>
-                <td className="md:px-4 px-2 py-3 flex items-center space-x-3">
+              <tr key={index} className="hover:bg-[#F7F7F2]/40 transition-colors">
+                <td className="px-5 py-3.5 text-center hidden sm:table-cell text-xs font-medium">{index + 1}</td>
+                <td className="px-5 py-3.5 flex items-center gap-3">
                   <img
                     src={item.student.imageUrl}
                     alt=""
-                    className="w-9 h-9 rounded-full"
+                    className="w-8 h-8 rounded-full border border-[#DCE5E3] object-cover"
                   />
-                  <span className="truncate">{item.student.name}</span>
+                  <span className="font-semibold text-[#17252A] truncate">{item.student.name}</span>
                 </td>
-                <td className="px-4 py-3 truncate">{item.courseTitle}</td>
-                <td className="px-4 py-3 hidden sm:table-cell">{new Date(item.purchaseDate).toLocaleDateString()}</td>
+                <td className="px-5 py-3.5 truncate font-medium text-[#17252A]">{item.courseTitle}</td>
+                <td className="px-5 py-3.5 hidden sm:table-cell text-xs font-medium">{new Date(item.purchaseDate).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        {enrolledStudents.length === 0 && (
+          <div className="py-16 text-center text-sm text-[#637278]">
+            No students enrolled yet.
+          </div>
+        )}
       </div>
     </div>
   ) : <Loading />

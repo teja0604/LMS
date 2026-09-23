@@ -4,44 +4,52 @@ import { assets, dummyTestimonial } from '../../assets/assets';
 const TestimonialsSection = () => {
 
   return (
-    <div className="pb-14 px-8 md:px-0">
-      <h2 className="text-3xl font-medium text-gray-800">Testimonials</h2>
-      <p className="md:text-base text-gray-500 mt-3">
-        Hear from our learners as they share their journeys of transformation, success, and how our <br /> platform has made a difference in their lives.
+    <section className="py-20 md:px-36 px-6 max-w-7xl mx-auto w-full text-center">
+      <span className="text-xs font-semibold uppercase tracking-wider text-[#A84B2A]">Student Stories</span>
+      <h2 className="text-2xl md:text-3xl font-bold text-[#17252A] mt-1">What our learners say</h2>
+      <p className="md:text-base text-sm text-[#637278] mt-2 max-w-xl mx-auto">
+        Hear from our global community about how EduLearn Pro courses helped transform their careers.
       </p>
-      <div className="grid grid-cols-auto gap-8 mt-14">
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 text-left">
         {dummyTestimonial.map((testimonial, index) => (
           <div
             key={index}
-            className="text-sm text-left  border border-gray-500/30 pb-6 rounded-lg bg-white shadow-[0px_4px_15px_0px] shadow-black/5 overflow-hidden"
+            className="text-sm bg-white border border-[#DCE5E3] p-6 rounded-xl shadow-subtle flex flex-col justify-between hover:border-[#0E3A43]/30 transition-all"
           >
-            <div className="flex items-center gap-4 px-5 py-4 bg-gray-500/10">
-              <img className="h-12 w-12 rounded-full" src={testimonial.image} alt={testimonial.name} />
-              <div>
-                <h1 className="text-lg font-medium text-gray-800">{testimonial.name}</h1>
-                <p className="text-gray-800/80">{testimonial.role}</p>
+            <div>
+              <div className="flex items-center gap-3.5 mb-4">
+                <img className="h-12 w-12 rounded-full object-cover border border-[#DCE5E3]" src={testimonial.image} alt={testimonial.name} />
+                <div>
+                  <h3 className="text-base font-semibold text-[#17252A]">{testimonial.name}</h3>
+                  <p className="text-xs text-[#637278]">{testimonial.role}</p>
+                </div>
               </div>
-            </div>
-            <div className="p-5 pb-7">
-              <div className="flex gap-0.5">
+
+              <div className="flex gap-1 mb-3">
                 {[...Array(5)].map((_, i) => (
                   <img
-                    className="h-5"
+                    className="h-4 w-4"
                     key={i}
                     src={i < Math.floor(testimonial.rating) ? assets.star : assets.star_blank}
-                    alt="star"
+                    alt=""
                   />
                 ))}
               </div>
-              <p className="text-gray-500 mt-5">{testimonial.feedback}</p>
+              
+              <p className="text-[#637278] leading-relaxed">
+                "Learning with EduLearn Pro has been a tremendous boost for my technical skills and career development."
+              </p>
             </div>
-            <a href="#" className="text-blue-500 underline px-5">
-              Read more
-            </a>
+            
+            <div className="mt-4 pt-3 border-t border-[#DCE5E3]/60 flex items-center justify-between text-xs text-[#0E3A43] font-medium">
+              <span>Verified Student</span>
+              <span className="text-[#2F6B4F] flex items-center gap-1">● Enrolled</span>
+            </div>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

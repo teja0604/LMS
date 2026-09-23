@@ -96,60 +96,79 @@ const CourseDetails = () => {
   }, [userData, courseData])
 
   return courseData ? (
-    <>
-      <div className="flex md:flex-row flex-col-reverse gap-10 relative items-start justify-between md:px-36 px-8 md:pt-20 pt-10 text-left">
-        <div className="absolute top-0 left-0 w-full h-section-height -z-1 bg-gradient-to-b from-cyan-100/70"></div>
+    <div className="min-h-screen flex flex-col justify-between bg-[#F7F7F2]">
+      <div className="flex md:flex-row flex-col-reverse gap-10 relative items-start justify-between md:px-36 px-6 md:pt-16 pt-8 text-left max-w-7xl mx-auto w-full">
 
-        <div className="max-w-xl z-10 text-gray-500">
-          <h1 className="md:text-course-deatails-heading-large text-course-deatails-heading-small font-semibold text-gray-800">
-            {courseData.courseTitle}
-          </h1>
-          <p className="pt-4 md:text-base text-sm" dangerouslySetInnerHTML={{ __html: courseData.courseDescription.slice(0, 200) }}>
-          </p>
-
-          <div className='flex items-center space-x-2 pt-3 pb-1 text-sm'>
-            <p>{calculateRating(courseData)}</p>
-            <div className='flex'>
-              {[...Array(5)].map((_, i) => (<img key={i} src={i < Math.floor(calculateRating(courseData)) ? assets.star : assets.star_blank} alt=''
-                className='w-3.5 h-3.5' />
-              ))}
-            </div>
-            <p className='text-blue-600'>({courseData.courseRatings.length} {courseData.courseRatings.length > 1 ? 'ratings' : 'rating'})</p>
-
-            <p>{courseData.enrolledStudents.length} {courseData.enrolledStudents.length > 1 ? 'students' : 'student'}</p>
+        <div className="max-w-2xl z-10 text-[#637278]">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F3D8CC]/60 text-[#A84B2A] text-xs font-semibold mb-3">
+            <span>Course Overview</span>
           </div>
 
-          <p className='text-sm'>Course by <span className='text-blue-600 underline'>{courseData.educator.name}</span></p>
+          <h1 className="md:text-course-deatails-heading-large text-course-deatails-heading-small font-bold text-[#17252A] leading-tight">
+            {courseData.courseTitle}
+          </h1>
+          
+          <div className="pt-4 md:text-base text-sm text-[#637278] leading-relaxed" dangerouslySetInnerHTML={{ __html: courseData.courseDescription.slice(0, 220) + (courseData.courseDescription.length > 220 ? '...' : '') }}>
+          </div>
 
-          <div className="pt-8 text-gray-800">
-            <h2 className="text-xl font-semibold">Course Structure</h2>
-            <div className="pt-5">
+          <div className='flex flex-wrap items-center gap-3 pt-4 pb-2 text-sm'>
+            <div className="flex items-center gap-1.5 font-bold text-[#A84B2A]">
+              <span>{calculateRating(courseData)}</span>
+              <div className='flex'>
+                {[...Array(5)].map((_, i) => (
+                  <img 
+                    key={i} 
+                    src={i < Math.floor(calculateRating(courseData)) ? assets.star : assets.star_blank} 
+                    alt=''
+                    className='w-4 h-4' 
+                  />
+                ))}
+              </div>
+            </div>
+            <span className="text-[#DCE5E3]">|</span>
+            <p className='text-[#0E3A43] font-medium'>({courseData.courseRatings.length} {courseData.courseRatings.length === 1 ? 'rating' : 'ratings'})</p>
+            <span className="text-[#DCE5E3]">|</span>
+            <p className="text-[#637278]">{courseData.enrolledStudents.length} {courseData.enrolledStudents.length === 1 ? 'student' : 'students'}</p>
+          </div>
+
+          <p className='text-sm text-[#637278] pt-1'>
+            Instructor: <span className='text-[#0E3A43] font-semibold hover:underline cursor-pointer'>{courseData.educator.name}</span>
+          </p>
+
+          <div className="pt-10 text-[#17252A]">
+            <h2 className="text-xl font-bold">Course Syllabus</h2>
+            <div className="pt-4 space-y-2.5">
               {courseData.courseContent.map((chapter, index) => (
-                <div key={index} className="border border-gray-300 bg-white mb-2 rounded">
+                <div key={index} className="border border-[#DCE5E3] bg-white rounded-xl overflow-hidden shadow-subtle">
                   <div
-                    className="flex items-center justify-between px-4 py-3 cursor-pointer select-none"
+                    className="flex items-center justify-between px-5 py-4 cursor-pointer select-none hover:bg-[#F7F7F2]/60 transition-colors"
                     onClick={() => toggleSection(index)}
                   >
-                    <div className="flex items-center gap-2">
-                      <img src={assets.down_arrow_icon} alt="arrow icon" className={`transform transition-transform ${openSections[index] ? "rotate-180" : ""}`} />
-                      <p className="font-medium md:text-base text-sm">{chapter.chapterTitle}</p>
+                    <div className="flex items-center gap-3">
+                      <img src={assets.down_arrow_icon} alt="arrow icon" className={`transform transition-transform opacity-70 ${openSections[index] ? "rotate-180" : ""}`} />
+                      <p className="font-semibold md:text-base text-sm text-[#17252A]">{chapter.chapterTitle}</p>
                     </div>
-                    <p className="text-sm md:text-default">{chapter.chapterContent.length} lectures - {calculateChapterTime(chapter)}</p>
+                    <p className="text-xs md:text-sm text-[#637278] font-medium">{chapter.chapterContent.length} lectures • {calculateChapterTime(chapter)}</p>
                   </div>
 
                   <div className={`overflow-hidden transition-all duration-300 ${openSections[index] ? "max-h-96" : "max-h-0"}`} >
-                    <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-gray-600 border-t border-gray-300">
+                    <ul className="divide-y divide-[#DCE5E3]/60 bg-[#F7F7F2]/30 border-t border-[#DCE5E3]">
                       {chapter.chapterContent.map((lecture, i) => (
-                        <li key={i} className="flex items-start gap-2 py-1">
-                          <img src={assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
-                          <div className="flex items-center justify-between w-full text-gray-800 text-xs md:text-default">
-                            <p>{lecture.lectureTitle}</p>
-                            <div className='flex gap-2'>
-                              {lecture.isPreviewFree && <p onClick={() => setPlayerData({
-                                videoId: lecture.lectureUrl.split('/').pop()
-                              })} className='text-blue-500 cursor-pointer'>Preview</p>}
-                              <p>{humanizeDuration(lecture.lectureDuration * 60 * 1000, { units: ['h', 'm'] })}</p>
-                            </div>
+                        <li key={i} className="flex items-center justify-between px-5 py-3 text-xs md:text-sm text-[#17252A] hover:bg-white transition-colors">
+                          <div className="flex items-center gap-2.5">
+                            <img src={assets.play_icon} alt="" className="w-4 h-4 opacity-70" />
+                            <p className="font-medium">{lecture.lectureTitle}</p>
+                          </div>
+                          <div className='flex items-center gap-3'>
+                            {lecture.isPreviewFree && (
+                              <button 
+                                onClick={() => setPlayerData({ videoId: lecture.lectureUrl.split('/').pop() })} 
+                                className='text-[#A84B2A] font-semibold hover:underline text-xs bg-[#F3D8CC]/50 px-2 py-0.5 rounded'
+                              >
+                                Preview
+                              </button>
+                            )}
+                            <span className="text-[#637278] text-xs">{humanizeDuration(lecture.lectureDuration * 60 * 1000, { units: ['h', 'm'] })}</span>
                           </div>
                         </li>
                       ))}
@@ -160,65 +179,75 @@ const CourseDetails = () => {
             </div>
           </div>
 
-          <div className="py-20 text-sm md:text-default">
-            <h3 className="text-xl font-semibold text-gray-800">Course Description</h3>
-            <p className="rich-text pt-3" dangerouslySetInnerHTML={{ __html: courseData.courseDescription }}>
-            </p>
+          <div className="py-14 text-sm md:text-base">
+            <h3 className="text-xl font-bold text-[#17252A] mb-3">About this Course</h3>
+            <div className="rich-text bg-white p-6 rounded-xl border border-[#DCE5E3]" dangerouslySetInnerHTML={{ __html: courseData.courseDescription }}>
+            </div>
           </div>
         </div>
 
-        <div className="max-w-course-card z-10 shadow-custom-card rounded-t md:rounded-none overflow-hidden bg-white min-w-[300px] sm:min-w-[420px]">
-          {
-            playerData
-              ? <YouTube videoId={playerData.videoId} opts={{ playerVars: { autoplay: 1 } }} iframeClassName='w-full aspect-video' />
-              : <img src={courseData.courseThumbnail} alt="" />
-          }
-          <div className="p-5">
-            <div className="flex items-center gap-2">
-              <img className="w-3.5" src={assets.time_left_clock_icon} alt="time left clock icon" />
-              <p className="text-red-500">
-                <span className="font-medium">5 days</span> left at this price!
-              </p>
+        {/* Sidebar Sticky Card */}
+        <div className="max-w-course-card z-10 shadow-custom-card rounded-2xl overflow-hidden bg-white border border-[#DCE5E3] min-w-[300px] sm:min-w-[400px] sticky top-24">
+          <div className="overflow-hidden bg-[#0E3A43]">
+            {
+              playerData
+                ? <YouTube videoId={playerData.videoId} opts={{ playerVars: { autoplay: 1 } }} iframeClassName='w-full aspect-video' />
+                : <img src={courseData.courseThumbnail} alt={courseData.courseTitle} className="w-full aspect-video object-cover" />
+            }
+          </div>
+          <div className="p-6">
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#A84B2A] bg-[#F3D8CC]/50 px-3 py-1.5 rounded-lg w-fit">
+              <img className="w-3.5" src={assets.time_left_clock_icon} alt="" />
+              <span>Limited enrollment period</span>
             </div>
-            <div className="flex gap-3 items-center pt-2">
-              <p className="text-gray-800 md:text-4xl text-2xl font-semibold">{currency}{(courseData.coursePrice - courseData.discount * courseData.coursePrice / 100).toFixed(2)}</p>
-              <p className="md:text-lg text-gray-500 line-through">{currency}{courseData.coursePrice}</p>
-              <p className="md:text-lg text-gray-500">{courseData.discount}% off</p>
+            
+            <div className="flex gap-3 items-baseline pt-4">
+              <p className="text-[#0E3A43] md:text-3xl text-2xl font-bold">{currency}{(courseData.coursePrice - courseData.discount * courseData.coursePrice / 100).toFixed(2)}</p>
+              {courseData.discount > 0 && (
+                <>
+                  <p className="text-sm text-[#637278] line-through">{currency}{courseData.coursePrice}</p>
+                  <span className="text-xs font-bold text-[#2F6B4F] bg-[#2F6B4F]/10 px-2 py-0.5 rounded">{courseData.discount}% OFF</span>
+                </>
+              )}
             </div>
-            <div className="flex items-center text-sm md:text-default gap-4 pt-2 md:pt-4 text-gray-500">
-              <div className="flex items-center gap-1">
-                <img src={assets.star} alt="star icon" />
-                <p>{calculateRating(courseData)}</p>
+
+            <div className="grid grid-cols-3 gap-2 py-4 my-4 border-y border-[#DCE5E3] text-center text-xs text-[#637278]">
+              <div className="flex flex-col items-center gap-1">
+                <span className="font-semibold text-[#17252A]">{calculateRating(courseData)} / 5</span>
+                <span>Rating</span>
               </div>
-              <div className="h-4 w-px bg-gray-500/40"></div>
-              <div className="flex items-center gap-1">
-                <img src={assets.time_clock_icon} alt="clock icon" />
-                <p>{calculateCourseDuration(courseData)}</p>
+              <div className="flex flex-col items-center gap-1 border-x border-[#DCE5E3]">
+                <span className="font-semibold text-[#17252A]">{calculateCourseDuration(courseData)}</span>
+                <span>Duration</span>
               </div>
-              <div className="h-4 w-px bg-gray-500/40"></div>
-              <div className="flex items-center gap-1">
-                <img src={assets.lesson_icon} alt="clock icon" />
-                <p>{calculateNoOfLectures(courseData)} lessons</p>
+              <div className="flex flex-col items-center gap-1">
+                <span className="font-semibold text-[#17252A]">{calculateNoOfLectures(courseData)}</span>
+                <span>Lessons</span>
               </div>
             </div>
-            <button onClick={enrollCourse} className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">
-              {isAlreadyEnrolled ? "Already Enrolled" : "Enroll Now"}
+
+            <button 
+              onClick={enrollCourse} 
+              className="btn-primary w-full py-3 rounded-lg font-semibold text-base shadow-sm"
+            >
+              {isAlreadyEnrolled ? "Already Enrolled" : "Enroll in Course"}
             </button>
+
             <div className="pt-6">
-              <p className="md:text-xl text-lg font-medium text-gray-800">What's in the course?</p>
-              <ul className="ml-4 pt-2 text-sm md:text-default list-disc text-gray-500">
-                <li>Lifetime access with free updates.</li>
-                <li>Step-by-step, hands-on project guidance.</li>
-                <li>Downloadable resources and source code.</li>
-                <li>Quizzes to test your knowledge.</li>
-                <li>Certificate of completion.</li>
+              <p className="text-sm font-bold text-[#17252A]">Includes in this course:</p>
+              <ul className="pt-2 text-xs text-[#637278] space-y-2">
+                <li className="flex items-center gap-2">✓ Full lifetime access with updates</li>
+                <li className="flex items-center gap-2">✓ Hands-on real-world assignments</li>
+                <li className="flex items-center gap-2">✓ Downloadable resources & cheat sheets</li>
+                <li className="flex items-center gap-2">✓ Certificate of completion by EduLearn Pro</li>
               </ul>
             </div>
           </div>
         </div>
+
       </div>
       <Footer />
-    </>
+    </div>
   ) : <Loading />
 };
 
