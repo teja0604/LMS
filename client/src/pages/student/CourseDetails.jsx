@@ -18,7 +18,27 @@ const CourseDetails = () => {
   const [playerData, setPlayerData] = useState(null)
   const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false)
 
-  const { backendUrl, currency, userData, calculateChapterTime, calculateCourseDuration, calculateRating, calculateNoOfLectures } = useContext(AppContext)
+  // Demo Payment Modal State
+  const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
+  const [showDemoModal, setShowDemoModal] = useState(false);
+  const [isDemoProcessing, setIsDemoProcessing] = useState(false);
+  const [cardHolder, setCardHolder] = useState('Demo Student');
+  const [cardNumber, setCardNumber] = useState('4242 4242 4242 4242');
+  const [cardExpiry, setCardExpiry] = useState('12/28');
+  const [cardCvc, setCardCvc] = useState('123');
+
+  const {
+    backendUrl,
+    currency,
+    userData,
+    fetchUserData,
+    fetchUserEnrolledCourses,
+    navigate,
+    calculateChapterTime,
+    calculateCourseDuration,
+    calculateRating,
+    calculateNoOfLectures
+  } = useContext(AppContext)
   const { getToken } = useAuth()
 
 
@@ -83,6 +103,45 @@ const CourseDetails = () => {
     }
   }
 
+  // Handle Demo Payment (College Presentation Mode)
+  const handleDemoPayment = async (e) => {
+    if (e) e.preventDefault();
+
+    try {
+      if (!userData) {
+        return toast.warn('Login to Enroll');
+      }
+
+      if (isAlreadyEnrolled) {
+        return toast.warn('Already Enrolled');
+      }
+
+      setIsDemoProcessing(true);
+      const token = await getToken();
+
+      const { data } = await axios.post(`${backendUrl}/api/user/demo-purchase`, {
+        courseId: courseData._id
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (data.success) {
+        toast.success(data.message || '🎉 Demo Payment Successful! Enrolled in course.');
+        setShowDemoModal(false);
+        if (fetchUserData) await fetchUserData();
+        if (fetchUserEnrolledCourses) await fetchUserEnrolledCourses();
+        navigate('/my-enrollments');
+      } else {
+        toast.error(data.message || 'Demo payment failed');
+      }
+
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsDemoProcessing(false);
+    }
+  };
+
   useEffect(() => {
     fetchCourseData()
   }, [])
@@ -107,7 +166,7 @@ const CourseDetails = () => {
           <h1 className="md:text-course-deatails-heading-large text-course-deatails-heading-small font-bold text-[#17252A] leading-tight">
             {courseData.courseTitle}
           </h1>
-          
+
           <div className="pt-4 md:text-base text-sm text-[#637278] leading-relaxed" dangerouslySetInnerHTML={{ __html: courseData.courseDescription.slice(0, 220) + (courseData.courseDescription.length > 220 ? '...' : '') }}>
           </div>
 
@@ -116,11 +175,11 @@ const CourseDetails = () => {
               <span>{calculateRating(courseData)}</span>
               <div className='flex'>
                 {[...Array(5)].map((_, i) => (
-                  <img 
-                    key={i} 
-                    src={i < Math.floor(calculateRating(courseData)) ? assets.star : assets.star_blank} 
+                  <img
+                    key={i}
+                    src={i < Math.floor(calculateRating(courseData)) ? assets.star : assets.star_blank}
                     alt=''
-                    className='w-4 h-4' 
+                    className='w-4 h-4'
                   />
                 ))}
               </div>
@@ -161,8 +220,8 @@ const CourseDetails = () => {
                           </div>
                           <div className='flex items-center gap-3'>
                             {lecture.isPreviewFree && (
-                              <button 
-                                onClick={() => setPlayerData({ videoId: lecture.lectureUrl.split('/').pop() })} 
+                              <button
+                                onClick={() => setPlayerData({ videoId: lecture.lectureUrl.split('/').pop() })}
                                 className='text-[#A84B2A] font-semibold hover:underline text-xs bg-[#F3D8CC]/50 px-2 py-0.5 rounded'
                               >
                                 Preview
@@ -200,7 +259,7 @@ const CourseDetails = () => {
               <img className="w-3.5" src={assets.time_left_clock_icon} alt="" />
               <span>Limited enrollment period</span>
             </div>
-            
+
             <div className="flex gap-3 items-baseline pt-4">
               <p className="text-[#0E3A43] md:text-3xl text-2xl font-bold">{currency}{(courseData.coursePrice - courseData.discount * courseData.coursePrice / 100).toFixed(2)}</p>
               {courseData.discount > 0 && (
@@ -226,12 +285,36 @@ const CourseDetails = () => {
               </div>
             </div>
 
-            <button 
-              onClick={enrollCourse} 
-              className="btn-primary w-full py-3 rounded-lg font-semibold text-base shadow-sm"
-            >
-              {isAlreadyEnrolled ? "Already Enrolled" : "Enroll in Course"}
-            </button>
+            {isAlreadyEnrolled ? (
+              <button
+                disabled
+                className="w-full py-3 rounded-lg font-semibold text-sm bg-[#E6EFEE] text-[#0E3A43] cursor-not-allowed"
+              >
+                Already Enrolled
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <button
+                  onClick={enrollCourse}
+                  className="btn-primary w-full py-3 rounded-lg font-semibold text-sm shadow-sm cursor-pointer"
+                >
+                  {isDemoMode ? "Enroll with Stripe Checkout" : "Enroll in Course"}
+                </button>
+
+                {isDemoMode && (
+                  <button
+                    onClick={() => {
+                      if (!userData) return toast.warn('Login to Enroll');
+                      setShowDemoModal(true);
+                    }}
+                    className="w-full py-2.5 px-3 rounded-lg font-semibold text-xs border border-[#A84B2A]/40 text-[#A84B2A] bg-[#F3D8CC]/40 hover:bg-[#F3D8CC]/80 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                  >
+                    <span>🎓</span>
+                    <span>Demo Payment — College Presentation</span>
+                  </button>
+                )}
+              </div>
+            )}
 
             <div className="pt-6">
               <p className="text-sm font-bold text-[#17252A]">Includes in this course:</p>
@@ -246,6 +329,109 @@ const CourseDetails = () => {
         </div>
 
       </div>
+
+      {/* Demo Payment Modal (College Presentation Mode) */}
+      {showDemoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="bg-white text-[#17252A] p-6 sm:p-7 rounded-2xl relative w-full max-w-md shadow-2xl border border-[#DCE5E3] space-y-5">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F3D8CC] text-[#A84B2A] text-2xs font-bold uppercase tracking-wider mb-1.5">
+                  <span>🎓 Presentation Demo Mode</span>
+                </div>
+                <h3 className="text-lg font-bold text-[#17252A]">Demo Checkout Simulation</h3>
+                <p className="text-xs text-[#637278]">Any mock values are accepted. No actual charge will occur.</p>
+              </div>
+              <button
+                onClick={() => setShowDemoModal(false)}
+                className="text-[#637278] hover:text-[#17252A] p-1 rounded-md"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-3.5 bg-[#F7F7F2] rounded-xl border border-[#DCE5E3] flex justify-between items-center">
+              <div>
+                <p className="text-xs text-[#637278] font-medium">Enrolling in:</p>
+                <p className="text-sm font-bold text-[#17252A] truncate max-w-[220px]">{courseData.courseTitle}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-[#637278] font-medium">Demo Total</p>
+                <p className="text-base font-bold text-[#0E3A43]">{currency}{(courseData.coursePrice - courseData.discount * courseData.coursePrice / 100).toFixed(2)}</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleDemoPayment} className="space-y-3.5 text-xs text-[#17252A]">
+              <div>
+                <label className="font-semibold text-[#637278] block mb-1">Cardholder Name</label>
+                <input
+                  type="text"
+                  value={cardHolder}
+                  onChange={(e) => setCardHolder(e.target.value)}
+                  placeholder="e.g. John Doe"
+                  className="w-full py-2.5 px-3 rounded-lg border border-[#DCE5E3] text-sm outline-none focus:border-[#0E3A43]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold text-[#637278] block mb-1">Card Number</label>
+                <input
+                  type="text"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(e.target.value)}
+                  placeholder="4242 •••• •••• 4242"
+                  className="w-full py-2.5 px-3 rounded-lg border border-[#DCE5E3] text-sm outline-none focus:border-[#0E3A43] tracking-wider"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-semibold text-[#637278] block mb-1">Expiry Date</label>
+                  <input
+                    type="text"
+                    value={cardExpiry}
+                    onChange={(e) => setCardExpiry(e.target.value)}
+                    placeholder="MM/YY"
+                    className="w-full py-2.5 px-3 rounded-lg border border-[#DCE5E3] text-sm outline-none focus:border-[#0E3A43]"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-[#637278] block mb-1">CVC / CVV</label>
+                  <input
+                    type="text"
+                    value={cardCvc}
+                    onChange={(e) => setCardCvc(e.target.value)}
+                    placeholder="123"
+                    className="w-full py-2.5 px-3 rounded-lg border border-[#DCE5E3] text-sm outline-none focus:border-[#0E3A43]"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowDemoModal(false)}
+                  className="w-1/3 py-2.5 rounded-lg border border-[#DCE5E3] hover:bg-[#F7F7F2] text-xs font-semibold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isDemoProcessing}
+                  className="w-2/3 py-2.5 rounded-lg btn-primary text-xs font-bold shadow-md cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+                >
+                  {isDemoProcessing ? 'Processing Demo...' : `Pay ${currency}${(courseData.coursePrice - courseData.discount * courseData.coursePrice / 100).toFixed(2)} & Enroll`}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   ) : <Loading />

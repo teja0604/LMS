@@ -25,7 +25,7 @@ export const getUserData = async (req, res) => {
     }
 }
 
-// Purchase Course 
+// Purchase Course
 export const purchaseCourse = async (req, res) => {
 
     try {
@@ -202,5 +202,52 @@ export const addUserRating = async (req, res) => {
         return res.json({ success: true, message: 'Rating added' });
     } catch (error) {
         return res.json({ success: false, message: error.message });
+    }
+};
+
+// Demo Purchase Course (College Presentation Mode)
+export const demoPurchaseCourse = async (req, res) => {
+    try {
+        if (process.env.DEMO_MODE !== 'true') {
+            return res.json({ success: false, message: 'Demo payment mode is disabled' });
+        }
+
+        const { courseId } = req.body;
+        const userId = req.auth.userId;
+
+        const courseData = await Course.findById(courseId);
+        const userData = await User.findById(userId);
+
+        if (!userData || !courseData) {
+            return res.json({ success: false, message: 'Data Not Found' });
+        }
+
+        if (userData.enrolledCourses.includes(courseData._id)) {
+            return res.json({ success: false, message: 'Already Enrolled' });
+        }
+
+        const purchaseAmount = (courseData.coursePrice - courseData.discount * courseData.coursePrice / 100).toFixed(2);
+
+        // 1. Create completed Purchase record
+        await Purchase.create({
+            courseId: courseData._id,
+            userId,
+            amount: Number(purchaseAmount),
+            status: 'completed'
+        });
+
+        // 2. Add student to course enrolled students
+        if (!courseData.enrolledStudents.includes(userData._id)) {
+            courseData.enrolledStudents.push(userData._id);
+            await courseData.save();
+        }
+
+        // 3. Add course to user enrolled courses
+        userData.enrolledCourses.push(courseData._id);
+        await userData.save();
+
+        res.json({ success: true, message: 'Enrolled successfully via Demo Payment' });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
     }
 };

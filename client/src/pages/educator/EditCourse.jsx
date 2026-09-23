@@ -22,6 +22,7 @@ const EditCourse = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const [courseTitle, setCourseTitle] = useState('');
+  const [courseDescription, setCourseDescription] = useState('');
   const [coursePrice, setCoursePrice] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [existingThumbnail, setExistingThumbnail] = useState('');
@@ -48,14 +49,11 @@ const EditCourse = () => {
       if (data.success && data.course) {
         const course = data.course;
         setCourseTitle(course.courseTitle || '');
+        setCourseDescription(course.courseDescription || '');
         setCoursePrice(course.coursePrice || 0);
         setDiscount(course.discount || 0);
         setExistingThumbnail(course.courseThumbnail || '');
         setChapters(course.courseContent || []);
-
-        if (quillRef.current && course.courseDescription) {
-          quillRef.current.root.innerHTML = course.courseDescription;
-        }
       } else {
         toast.error(data.message || 'Failed to load course data');
         navigate('/educator/my-courses');
@@ -139,8 +137,9 @@ const EditCourse = () => {
         return toast.error('Course Title is required');
       }
 
-      const description = quillRef.current ? quillRef.current.root.innerHTML : '';
-      if (!description || description === '<p><br></p>') {
+      const description = quillRef.current ? quillRef.current.root.innerHTML : courseDescription;
+      const cleanText = description ? description.replace(/<[^>]+>/g, '').trim() : '';
+      if (!description || description === '<p><br></p>' || cleanText.length === 0) {
         return toast.error('Course Description is required');
       }
 
@@ -181,13 +180,22 @@ const EditCourse = () => {
   };
 
   useEffect(() => {
-    if (!quillRef.current && editorRef.current) {
+    fetchCourseData();
+  }, [courseId]);
+
+  useEffect(() => {
+    if (!loading && editorRef.current && !quillRef.current) {
       quillRef.current = new Quill(editorRef.current, {
         theme: 'snow',
       });
+      if (courseDescription) {
+        quillRef.current.root.innerHTML = courseDescription;
+      }
+      quillRef.current.on('text-change', () => {
+        setCourseDescription(quillRef.current.root.innerHTML);
+      });
     }
-    fetchCourseData();
-  }, [courseId]);
+  }, [loading, courseDescription]);
 
   if (loading) {
     return <Loading />;
@@ -212,13 +220,13 @@ const EditCourse = () => {
       <form onSubmit={handleSubmit} className='bg-white border border-[#DCE5E3] rounded-xl p-6 md:p-8 space-y-6 shadow-subtle text-[#17252A]'>
         <div className='flex flex-col gap-1.5'>
           <label className="text-sm font-semibold">Course Title</label>
-          <input 
-            onChange={e => setCourseTitle(e.target.value)} 
-            value={courseTitle} 
-            type="text" 
-            placeholder='e.g. Master Full-Stack Web Development' 
-            className='outline-none py-2.5 px-3.5 rounded-lg border border-[#DCE5E3] focus:border-[#0E3A43] focus:ring-1 focus:ring-[#0E3A43] text-sm transition-all' 
-            required 
+          <input
+            onChange={e => setCourseTitle(e.target.value)}
+            value={courseTitle}
+            type="text"
+            placeholder='e.g. Master Full-Stack Web Development'
+            className='outline-none py-2.5 px-3.5 rounded-lg border border-[#DCE5E3] focus:border-[#0E3A43] focus:ring-1 focus:ring-[#0E3A43] text-sm transition-all'
+            required
           />
         </div>
 
@@ -232,28 +240,28 @@ const EditCourse = () => {
         <div className='grid grid-cols-1 sm:grid-cols-3 gap-6 items-start'>
           <div className='flex flex-col gap-1.5'>
             <label className="text-sm font-semibold">Price ($)</label>
-            <input 
-              onChange={e => setCoursePrice(e.target.value)} 
-              value={coursePrice} 
-              type="number" 
-              placeholder='0' 
+            <input
+              onChange={e => setCoursePrice(e.target.value)}
+              value={coursePrice}
+              type="number"
+              placeholder='0'
               min="0"
-              className='outline-none py-2.5 px-3.5 rounded-lg border border-[#DCE5E3] focus:border-[#0E3A43] text-sm' 
-              required 
+              className='outline-none py-2.5 px-3.5 rounded-lg border border-[#DCE5E3] focus:border-[#0E3A43] text-sm'
+              required
             />
           </div>
 
           <div className='flex flex-col gap-1.5'>
             <label className="text-sm font-semibold">Discount (%)</label>
-            <input 
-              onChange={e => setDiscount(e.target.value)} 
-              value={discount} 
-              type="number" 
-              placeholder='0' 
-              min="0" 
-              max="100" 
-              className='outline-none py-2.5 px-3.5 rounded-lg border border-[#DCE5E3] focus:border-[#0E3A43] text-sm' 
-              required 
+            <input
+              onChange={e => setDiscount(e.target.value)}
+              value={discount}
+              type="number"
+              placeholder='0'
+              min="0"
+              max="100"
+              className='outline-none py-2.5 px-3.5 rounded-lg border border-[#DCE5E3] focus:border-[#0E3A43] text-sm'
+              required
             />
           </div>
 
@@ -277,18 +285,18 @@ const EditCourse = () => {
         {/* Chapters & Lectures */}
         <div className="pt-4 border-t border-[#DCE5E3]">
           <h2 className="text-base font-bold text-[#17252A] mb-3">Course Curriculum</h2>
-          
+
           <div className="space-y-3">
             {chapters.map((chapter, chapterIndex) => (
               <div key={chapter.chapterId || chapterIndex} className="bg-[#F7F7F2] border border-[#DCE5E3] rounded-xl overflow-hidden">
                 <div className="flex justify-between items-center p-4 border-b border-[#DCE5E3] bg-white">
                   <div className="flex items-center gap-2">
-                    <img 
-                      className={`cursor-pointer transition-transform ${chapter.collapsed ? "-rotate-90" : ""}`} 
-                      onClick={() => handleChapter('toggle', chapter.chapterId)} 
-                      src={assets.dropdown_icon} 
-                      width={14} 
-                      alt="" 
+                    <img
+                      className={`cursor-pointer transition-transform ${chapter.collapsed ? "-rotate-90" : ""}`}
+                      onClick={() => handleChapter('toggle', chapter.chapterId)}
+                      src={assets.dropdown_icon}
+                      width={14}
+                      alt=""
                     />
                     <span className="font-semibold text-sm text-[#17252A]">Chapter {chapterIndex + 1}: {chapter.chapterTitle}</span>
                   </div>
@@ -306,9 +314,9 @@ const EditCourse = () => {
                         <img onClick={() => handleLecture('remove', chapter.chapterId, lectureIndex)} src={assets.cross_icon} alt="Remove" className='cursor-pointer w-3 h-3 opacity-60 hover:opacity-100' />
                       </div>
                     ))}
-                    <button 
-                      type="button" 
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0E3A43] bg-white border border-[#0E3A43]/30 px-3 py-1.5 rounded-md hover:bg-[#E6EFEE] transition-colors mt-2 cursor-pointer" 
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0E3A43] bg-white border border-[#0E3A43]/30 px-3 py-1.5 rounded-md hover:bg-[#E6EFEE] transition-colors mt-2 cursor-pointer"
                       onClick={() => handleLecture('add', chapter.chapterId)}
                     >
                       + Add Lecture
@@ -319,9 +327,9 @@ const EditCourse = () => {
             ))}
           </div>
 
-          <button 
-            type="button" 
-            className="w-full flex justify-center items-center gap-2 bg-[#E6EFEE] hover:bg-[#D5E0E1] text-[#0E3A43] font-semibold py-3 rounded-xl cursor-pointer mt-4 transition-colors text-sm" 
+          <button
+            type="button"
+            className="w-full flex justify-center items-center gap-2 bg-[#E6EFEE] hover:bg-[#D5E0E1] text-[#0E3A43] font-semibold py-3 rounded-xl cursor-pointer mt-4 transition-colors text-sm"
             onClick={() => handleChapter('add')}
           >
             + Add New Chapter
@@ -361,7 +369,7 @@ const EditCourse = () => {
                   </div>
                   <div className="flex items-center gap-2 pt-2">
                     <input
-                      type="checkbox" 
+                      type="checkbox"
                       id="editPreviewCheck"
                       className='rounded text-[#0E3A43] focus:ring-[#0E3A43] scale-110 cursor-pointer'
                       checked={lectureDetails.isPreviewFree}
@@ -391,8 +399,8 @@ const EditCourse = () => {
           >
             Cancel
           </button>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={submitting}
             className='btn-primary py-2.5 px-8 rounded-lg font-semibold text-sm shadow-md cursor-pointer disabled:opacity-50'
           >
