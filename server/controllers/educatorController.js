@@ -40,17 +40,25 @@ export const addCourse = async (req, res) => {
             return res.json({ success: false, message: 'Thumbnail Not Attached' })
         }
 
-        const parsedCourseData = await JSON.parse(courseData)
+        if (!courseData) {
+            return res.json({ success: false, message: 'Course data is required' })
+        }
 
-        parsedCourseData.educator = educatorId
+        const parsedCourseData = JSON.parse(courseData)
 
-        const newCourse = await Course.create(parsedCourseData)
+        if (!parsedCourseData.courseTitle || !parsedCourseData.courseTitle.trim()) {
+            return res.json({ success: false, message: 'Course title is required' })
+        }
 
+        // 1. Upload to Cloudinary first
         const imageUpload = await cloudinary.uploader.upload(imageFile.path)
 
-        newCourse.courseThumbnail = imageUpload.secure_url
+        // 2. Attach educator and thumbnail url
+        parsedCourseData.educator = educatorId
+        parsedCourseData.courseThumbnail = imageUpload.secure_url
 
-        await newCourse.save()
+        // 3. Create course document in MongoDB
+        await Course.create(parsedCourseData)
 
         res.json({ success: true, message: 'Course Added' })
 
@@ -58,6 +66,113 @@ export const addCourse = async (req, res) => {
 
         res.json({ success: false, message: error.message })
 
+    }
+}
+
+// Get Single Educator Course By ID (for editing)
+export const getEducatorCourseById = async (req, res) => {
+    try {
+        const { courseId } = req.params
+        const educator = req.auth.userId
+
+        const course = await Course.findById(courseId)
+
+        if (!course) {
+            return res.json({ success: false, message: 'Course not found' })
+        }
+
+        if (course.educator !== educator) {
+            return res.json({ success: false, message: 'Unauthorized: You do not own this course' })
+        }
+
+        res.json({ success: true, course })
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// Update Course
+export const updateCourse = async (req, res) => {
+    try {
+        const { courseId } = req.params
+        const { courseData } = req.body
+        const imageFile = req.file
+        const educator = req.auth.userId
+
+        const course = await Course.findById(courseId)
+
+        if (!course) {
+            return res.json({ success: false, message: 'Course not found' })
+        }
+
+        if (course.educator !== educator) {
+            return res.json({ success: false, message: 'Unauthorized: You do not own this course' })
+        }
+
+        if (!courseData) {
+            return res.json({ success: false, message: 'Course data is required' })
+        }
+
+        const parsedCourseData = JSON.parse(courseData)
+
+        // Validation
+        if (!parsedCourseData.courseTitle || !parsedCourseData.courseTitle.trim()) {
+            return res.json({ success: false, message: 'Course title is required' })
+        }
+
+        if (!parsedCourseData.courseDescription || !parsedCourseData.courseDescription.trim()) {
+            return res.json({ success: false, message: 'Course description is required' })
+        }
+
+        if (parsedCourseData.coursePrice === undefined || parsedCourseData.coursePrice < 0) {
+            return res.json({ success: false, message: 'Valid course price is required' })
+        }
+
+        if (parsedCourseData.discount === undefined || parsedCourseData.discount < 0 || parsedCourseData.discount > 100) {
+            return res.json({ success: false, message: 'Discount must be between 0 and 100' })
+        }
+
+        course.courseTitle = parsedCourseData.courseTitle
+        course.courseDescription = parsedCourseData.courseDescription
+        course.coursePrice = Number(parsedCourseData.coursePrice)
+        course.discount = Number(parsedCourseData.discount)
+        course.courseContent = parsedCourseData.courseContent || []
+
+        // If new thumbnail is uploaded
+        if (imageFile) {
+            const imageUpload = await cloudinary.uploader.upload(imageFile.path)
+            course.courseThumbnail = imageUpload.secure_url
+        }
+
+        await course.save()
+
+        res.json({ success: true, message: 'Course updated successfully' })
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// Delete Course
+export const deleteCourse = async (req, res) => {
+    try {
+        const { courseId } = req.params
+        const educator = req.auth.userId
+
+        const course = await Course.findById(courseId)
+
+        if (!course) {
+            return res.json({ success: false, message: 'Course not found' })
+        }
+
+        if (course.educator !== educator) {
+            return res.json({ success: false, message: 'Unauthorized: You do not own this course' })
+        }
+
+        await Course.findByIdAndDelete(courseId)
+
+        res.json({ success: true, message: 'Course deleted successfully' })
+    } catch (error) {
+        res.json({ success: false, message: error.message })
     }
 }
 

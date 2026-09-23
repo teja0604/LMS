@@ -8,6 +8,7 @@ import Dashboard from './pages/educator/Dashboard'
 import AddCourse from './pages/educator/AddCourse'
 import MyCourses from './pages/educator/MyCourses'
 import StudentsEnrolled from './pages/educator/StudentsEnrolled'
+import EditCourse from './pages/educator/EditCourse'
 import Educator from './pages/educator/Educator'
 import 'quill/dist/quill.snow.css'
 import 'react-toastify/dist/ReactToastify.css';
@@ -36,6 +37,7 @@ const App = () => {
         <Route path='/educator' element={<Educator />}>
           <Route path='/educator' element={<Dashboard />} />
           <Route path='add-course' element={<AddCourse />} />
+          <Route path='edit-course/:courseId' element={<EditCourse />} />
           <Route path='my-courses' element={<MyCourses />} />
           <Route path='student-enrolled' element={<StudentsEnrolled />} />
         </Route>
